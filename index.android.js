@@ -17,6 +17,7 @@ import Firebase from'firebase';
 import StatusBar from'./components/StatusBar';
 import ActionButton from'./components/ActionButton';
 import ListItem from'./components/ListItem';
+import DialogAndroid from 'react-native-dialogs';
 import styles from './styles.js';
 
 
@@ -38,16 +39,18 @@ class GroceryApp extends React.Component {
 
   _renderItem(item) {
     const onPress = () => {
-      AlertIOS.prompt(
-        'Complete',
-        'Cross off '+item.title+'?',
-        [
-          {text: 'Complete', onPress: (text) => this.itemsRef.child(item._key).remove()},
-          {text: 'Cancel', onPress: (text) => console.log('Cancel')},
-          {text: '???', onPress: (text) => console.log('mystery Button')}
-        ],
-        'default'
-      );
+      var options = {
+        title: "Complete",
+        content: "Cross off " +item.title+"?",
+        positiveText: 'Complete',
+        negativeText: 'Cancel',
+        'onPositive': () => this.itemsRef.child(item._key).remove(),
+        'onNegative': () => console.log('Cancel'),
+      }
+
+      var dialog = new DialogAndroid();
+      dialog.set(options);
+      dialog.show();
     }
     return (
       <ListItem item={item} onPress={onPress}/>
@@ -55,19 +58,33 @@ class GroceryApp extends React.Component {
   }
 
   _addItem() {
-    AlertIOS.prompt(
-      'Add New Item',
-      null,
-      [
-        {
-          text: 'Add',
-          onPress: (text) => {
-            this.itemsRef.push({ title: text})
-          }
+    // AlertIOS.prompt(
+    //   'Add New Item',
+    //   null,
+    //   [
+    //     {
+    //       text: 'Add',
+    //       onPress: (text) => {
+    //         this.itemsRef.push({ title: text})
+    //       }
+    //     },
+    //   ],
+    //   'plain-text'
+    // );
+    var options = {
+        title: "Add New Item",
+        input: {
+          hint: 'Item Name',
+          allowEmptyInput: false,
+          callback: (text) => {this.itemsRef.push({ title: text })}
         },
-      ],
-      'plain-text'
-    );
+        positiveText: 'Add',
+        negativeText: 'Cancel'
+      }
+
+      var dialog = new DialogAndroid();
+      dialog.set(options);
+      dialog.show();
   }
 
   render() {
